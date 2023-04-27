@@ -61,7 +61,7 @@ dependencies {
     implementation(libs.mapStruct)
 //    implementation(libs.jooq)
 
-//    implementation(libs.bundles.jmolecules)
+    implementation(libs.bundles.jmolecules)
     implementation(libs.bundles.openApi)
 
 //    implementation(libs.bundles.ff4j)

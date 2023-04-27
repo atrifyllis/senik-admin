@@ -52,7 +52,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-    implementation("org.flywaydb:flyway-core")
+//    implementation("org.flywaydb:flyway-core")
     implementation("org.postgresql:postgresql")
 
     implementation(libs.oktaSpring)
@@ -81,7 +81,7 @@ dependencies {
     implementation("gr.alx:common")
 
 
-    runtimeOnly("org.postgresql:postgresql")
+//    runtimeOnly("org.postgresql:postgresql")
 //    compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 

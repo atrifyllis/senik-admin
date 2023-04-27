@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8082
 spring:
   #  jpa:
   #    open-in-view: false
@@ -12,7 +12,9 @@ spring:
   #        ddl-auto: validate
   #        use-new-id-generator-mappings: false
   #        types.jackson.object.mapper: gr.alx.common.adapters.secondary.persistence.HibernateTypesObjectMapperSupplier # without this, hibernate types ignore the usage of custom ObjectMapper
-
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false

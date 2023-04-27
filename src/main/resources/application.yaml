@@ -1,0 +1,108 @@
+server:
+  port: 8081
+spring:
+  #  jpa:
+  #    open-in-view: false
+  #    # two lines bellow needed for not logging query twice
+  #    show-sql: false
+  #    properties:
+  #      hibernate:
+  #        show_sql: false
+  #        format_sql: true
+  #        ddl-auto: validate
+  #        use-new-id-generator-mappings: false
+  #        types.jackson.object.mapper: gr.alx.common.adapters.secondary.persistence.HibernateTypesObjectMapperSupplier # without this, hibernate types ignore the usage of custom ObjectMapper
+
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+
+  #  datasource:
+  #    url: jdbc:postgresql://localhost:65432/senik
+  #    username: senik
+  #    password: senik
+  #
+  #  flyway:
+  #    enabled: true
+
+  #    json serde by default:
+  kafka:
+    bootstrap-servers:
+      - localhost:9093
+    consumer:
+      isolation-level: read_committed # used in autoconfigured ConcurrentKafkaListenerContainerFactory
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+  output:
+    ansi:
+      enabled: always # needed because when running tests in intellij ansi is not rendered otehrwise
+  application:
+    name: senik-admin
+
+logging:
+  pattern:
+    level: "user: %X{userId:-UNKNOWN} %clr(%5p) [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+okta:
+  oauth2:
+    issuer: https://dev-12550077.okta.com/oauth2/default
+    clientId: 0oa54gy6kbqpXlYeu5d7
+    clientSecret: OdRy6Akv2_tE7qD9H6eiIsQZMRIgDBTMWqQFkyKm
+
+springdoc:
+  default-produces-media-type: application/json
+  paths-to-exclude: /internal-api/** # ff4j
+
+
+#ff4j:
+#  web-console:
+#    enabled: true
+#  audit:
+#    enabled: true
+#  api:
+#    spring-doc:
+#      enabled: false
+#    context-path: "/internal-api/ff4j" #just to differentiate from our api
+
+cors:
+  allowedOrigins:
+    - "http://localhost:4200" # local dev mode
+    - "http://localhost:8082" # local k3d cluster
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" # expose all endpoints
+    beans:
+      cache:
+        time-to-live: "3s" # reduce caching
+  endpoint:
+    health:
+      show-components: "always" # show all health components
+  info:
+    env:
+      enabled: true # for future use (?)
+    java:
+      enabled: true
+    os:
+      enabled: true
+  tracing:
+    sampling:
+      probability: 1.0 # All traces should be sent to latency analysis tool
+
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+    tags:
+      app: senik
+
+#jdbc:
+#  datasource-proxy:
+#    include-parameter-values: true

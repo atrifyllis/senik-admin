@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import gr.alx.common.domain.model.DomainEvent
 import jakarta.validation.ValidationException
-import mu.KotlinLogging
+import org.apache.kafka.clients.consumer.Consumer
+import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.kafka.DefaultKafkaConsumerFactoryCustomizer
@@ -16,25 +17,18 @@ import org.springframework.kafka.annotation.KafkaListenerConfigurer
 import org.springframework.kafka.config.KafkaListenerEndpointRegistrar
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.core.KafkaTemplate
-import org.springframework.kafka.listener.DeadLetterPublishingRecoverer
-import org.springframework.kafka.listener.DefaultErrorHandler
+import org.springframework.kafka.listener.*
 import org.springframework.kafka.support.ExponentialBackOffWithMaxRetries
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
 import org.springframework.kafka.support.serializer.JsonDeserializer
+import org.springframework.util.backoff.BackOff
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
-
-
-const val CALCULATION_COMMANDS = "calculation.commands"
-const val CALCULATION_COMMANDS_DLT = "calculation.commands.DLT"
-
-private val log = KotlinLogging.logger {}
-
 
 @Configuration
 @EnableKafka
 class KafkaConfig(
-        @Autowired
-        private var validator: LocalValidatorFactoryBean,
+    @Autowired
+    private var validator: LocalValidatorFactoryBean,
 ) : KafkaListenerConfigurer {
 
     /**
@@ -45,7 +39,10 @@ class KafkaConfig(
     }
 
     @Bean
-    fun defaultErrorHandler(kafkaTemplate: KafkaTemplate<String, Any>): DefaultErrorHandler {
+    fun defaultErrorHandler(
+        kafkaTemplate: KafkaTemplate<String, Any>,
+        commonLoggingErrorHandler: CommonLoggingErrorHandler
+    ): DefaultErrorHandler {
         // Publish to dead letter topic any messages dropped after retries with back off
         val recoverer = DeadLetterPublishingRecoverer(kafkaTemplate)
         // Spread out attempts over time, taking a little longer between each attempt
@@ -54,7 +51,7 @@ class KafkaConfig(
         exponentialBackOff.initialInterval = 500L
         exponentialBackOff.multiplier = 1.5
         exponentialBackOff.maxInterval = 2000
-        val errorHandler = DefaultErrorHandler(recoverer, exponentialBackOff)
+        val errorHandler = DefaultLoggingErrorHandler(recoverer, exponentialBackOff, commonLoggingErrorHandler)
         // Do not try to recover from validation exceptions when validation has failed
         errorHandler.addNotRetryableExceptions(ValidationException::class.java)
         return errorHandler
@@ -70,12 +67,43 @@ class KafkaConfig(
      */
 
     @Bean
-    fun kafkaConsumerFactory(customizers: ObjectProvider<DefaultKafkaConsumerFactoryCustomizer>, properties: KafkaProperties, objectMapper: ObjectMapper): DefaultKafkaConsumerFactory<*, *> {
+    fun kafkaConsumerFactory(
+        customizers: ObjectProvider<DefaultKafkaConsumerFactoryCustomizer>,
+        properties: KafkaProperties,
+        objectMapper: ObjectMapper
+    ): DefaultKafkaConsumerFactory<*, *> {
         val factory = DefaultKafkaConsumerFactory<String, DomainEvent>(properties.buildConsumerProperties())
-        customizers.orderedStream().forEach { customizer: DefaultKafkaConsumerFactoryCustomizer -> customizer.customize(factory) }
-        factory.setValueDeserializer(ErrorHandlingDeserializer(JsonDeserializer(object : TypeReference<DomainEvent>() {}, objectMapper)))
+        customizers.orderedStream()
+            .forEach { customizer: DefaultKafkaConsumerFactoryCustomizer -> customizer.customize(factory) }
+        factory.setValueDeserializer(ErrorHandlingDeserializer(JsonDeserializer(object :
+            TypeReference<DomainEvent>() {}, objectMapper)))
         return factory
     }
 
+    @Bean
+    fun commonLoggingErrorHandler(): CommonLoggingErrorHandler {
+        return CommonLoggingErrorHandler()
+    }
 
+    /**
+     * Extends DefaultErrorHandler to also log exception (otherwise message is sent to dead letter topic and exception
+     * is never logged).
+     */
+    class DefaultLoggingErrorHandler(
+        recoverer: ConsumerRecordRecoverer,
+        backOff: BackOff,
+        private val commonLoggingErrorHandler: CommonLoggingErrorHandler
+    ) : DefaultErrorHandler(recoverer, backOff) {
+        override fun handleOne(
+            thrownException: Exception,
+            record: ConsumerRecord<*, *>,
+            consumer: Consumer<*, *>,
+            container: MessageListenerContainer
+        ): Boolean {
+
+            commonLoggingErrorHandler.handleOne(thrownException, record, consumer, container)
+
+            return super.handleOne(thrownException, record, consumer, container)
+        }
+    }
 }

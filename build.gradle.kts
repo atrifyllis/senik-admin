@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.springDepManagement)
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.kotlinPluginSpring)
-//    alias(libs.plugins.kotlinPluginJpa)
+    alias(libs.plugins.kotlinPluginJpa)
     alias(libs.plugins.gradlePrettyLogger)
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.kotlinKapt)
@@ -39,7 +39,7 @@ extra["testcontainersVersion"] = "1.18.0"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-//    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 //    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -81,7 +81,7 @@ dependencies {
     implementation("gr.alx:common")
 
 
-//    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("org.postgresql:postgresql")
 //    compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 

@@ -1,31 +1,30 @@
 server:
   port: 8082
+
 spring:
-  #  jpa:
-  #    open-in-view: false
-  #    # two lines bellow needed for not logging query twice
-  #    show-sql: false
-  #    properties:
-  #      hibernate:
-  #        show_sql: false
-  #        format_sql: true
-  #        ddl-auto: validate
-  #        use-new-id-generator-mappings: false
-  #        types.jackson.object.mapper: gr.alx.common.adapters.secondary.persistence.HibernateTypesObjectMapperSupplier # without this, hibernate types ignore the usage of custom ObjectMapper
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  jpa:
+    open-in-view: false
+    # two lines bellow needed for not logging query twice
+    show-sql: false
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: true
+        ddl-auto: validate
+        use-new-id-generator-mappings: false
+        types.jackson.object.mapper: gr.alx.common.adapters.secondary.persistence.HibernateTypesObjectMapperSupplier # without this, hibernate types ignore the usage of custom ObjectMapper
+
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
 
-  #  datasource:
-  #    url: jdbc:postgresql://localhost:65432/senik
-  #    username: senik
-  #    password: senik
-  #
-  #  flyway:
-  #    enabled: true
+  datasource:
+    url: jdbc:postgresql://localhost:65433/senik-admin
+    username: senik
+    password: senik
+
+  flyway:
+    enabled: true
 
   #    json serde by default:
   kafka:

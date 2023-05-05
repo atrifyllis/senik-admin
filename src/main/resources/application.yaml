@@ -50,8 +50,8 @@ logging:
 okta:
   oauth2:
     issuer: https://dev-12550077.okta.com/oauth2/default
-    clientId: 0oa54gy6kbqpXlYeu5d7
-    clientSecret: OdRy6Akv2_tE7qD9H6eiIsQZMRIgDBTMWqQFkyKm
+    clientId: 0oa9eqqfheZh6sVpk5d7
+    clientSecret: f8Mkf37fudSx4ciq9TYrpdUYRsdrhh7CuBSf4B6m
 
 springdoc:
   default-produces-media-type: application/json
@@ -102,7 +102,7 @@ management:
           server:
             requests: true
     tags:
-      app: senik
+      app: senik-admin
 
 #jdbc:
 #  datasource-proxy:

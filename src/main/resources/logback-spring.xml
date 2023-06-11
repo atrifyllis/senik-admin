@@ -12,7 +12,7 @@
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
 
         <http>
-            <url>http://localhost:3100/loki/api/v1/push</url>
+            <url>http://localhost:30018/loki/api/v1/push</url>
         </http>
         <format>
             <label>
@@ -21,11 +21,7 @@
                 </pattern>
             </label>
             <message>
-                <pattern>timestamp=%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd'T'HH:mm:ss.SSSXXX}} user=%X{userId:-UNKNOWN}
-                    level=%p [{${appName:-},%X{traceId:-},%X{spanId:-}}] pid=${PID:- } thread=[%t]
-                    logger=%-40.40logger{39} : msg=%replace(%replace(%msg){"\&quot;","'"}){"="," eq
-                    "}%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}
-                </pattern>
+                <pattern>timestamp=%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd'T'HH:mm:ss.SSSXXX}} user=%X{userId:-UNKNOWN} level=%p [{${appName:-},%X{traceId:-},%X{spanId:-}}] pid=${PID:- } thread=[%t] logger=%-40.40logger{39} : msg=%replace(%replace(%msg){"\&quot;","'"}){"="," eq "}%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}</pattern>
             </message>
             <sortByTime>true</sortByTime>
         </format>

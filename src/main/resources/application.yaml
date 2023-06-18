@@ -93,7 +93,7 @@ management:
       enabled: true
   tracing:
     propagation:
-      type: B3
+      type: W3C
     sampling:
       probability: 1.0 # All traces should be sent to latency analysis tool
 

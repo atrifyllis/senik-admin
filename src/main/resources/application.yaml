@@ -92,6 +92,8 @@ management:
     os:
       enabled: true
   tracing:
+    propagation:
+      type: B3
     sampling:
       probability: 1.0 # All traces should be sent to latency analysis tool
 
@@ -106,6 +108,7 @@ management:
 
   zipkin:
     tracing:
+
       endpoint: http://localhost:30017/api/v2/spans
 
 #jdbc:

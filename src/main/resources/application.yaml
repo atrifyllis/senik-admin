@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8081
 
 spring:
   jpa:
@@ -71,7 +71,7 @@ springdoc:
 cors:
   allowedOrigins:
     - "http://localhost:4200" # local dev mode
-    - "http://localhost:8082" # local k3d cluster
+    - "http://localhost:8081" # local k3d cluster
 
 management:
   endpoints:
